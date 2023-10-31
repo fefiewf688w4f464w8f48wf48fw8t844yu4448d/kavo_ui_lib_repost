@@ -233,30 +233,38 @@ function Kavo.CreateLib(kavName, themeList)
 	Main.ClipsDescendants = true
 	Main.Position = UDim2.new(0.336503863, 0, 0.275485456, 0)
 	Main.Size = UDim2.new(0, 525, 0, 318)
+	Main.Active = true
+	Main.Draggable = true
 	
-	local dragging
+	local frame = script.Parent
+
+	local dragging = false
 	local dragStart
 
-	Main.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	local function onTouchStart(input)
+		if input.UserInputType == Enum.UserInputType.Touch and input.UserInputType ~= Enum.UserInputType.MouseButton1 then
 			dragging = true
-			dragStart = input.Position - Main.Position
-			input.UserInputState = Enum.UserInputState.Begin
+			dragStart = input.Position - frame.Position
 		end
-	end)
+	end
 
-	Main.InputChanged:Connect(function(input)
-		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+	local function onTouchMove(input)
+		if dragging then
 			local newPosition = UDim2.new(0, input.Position.X - dragStart.X, 0, input.Position.Y - dragStart.Y)
-			Main.Position = newPosition
+			frame.Position = newPosition
 		end
-	end)
+	end
 
-	Main.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	local function onTouchEnd(input)
+		if dragging then
 			dragging = false
 		end
-	end)
+	end
+
+	frame.InputBegan:Connect(onTouchStart)
+	frame.InputChanged:Connect(onTouchMove)
+	frame.InputEnded:Connect(onTouchEnd)
+
 
 	MainCorner.CornerRadius = UDim.new(0, 4)
 	MainCorner.Name = "MainCorner"
